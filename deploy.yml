@@ -1,0 +1,54 @@
+name: Deploy TalkFlow to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps
+
+      - name: Add web support packages (Expo picks matching versions)
+        run: npx expo install react-dom react-native-web @expo/metro-runtime -- --legacy-peer-deps
+
+      - name: Build web app
+        run: npx expo export --platform web
+
+      - name: Add app manifest and icons
+        run: |
+          cp talkflow-manifest.json dist/manifest.json
+          cp talkflow-icon-192.png talkflow-icon-512.png dist/
+          sed -i 's|</head>|<link rel="manifest" href="manifest.json"><meta name="description" content="Practice speaking English and get instant AI feedback."><meta name="theme-color" content="#0D0705"></head>|' dist/index.html
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
