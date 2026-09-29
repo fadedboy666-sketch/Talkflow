@@ -1,0 +1,20 @@
+{
+  "expo": {
+    "name": "TalkFlow",
+    "slug": "talkflow",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "android": {
+      "edgeToEdgeEnabled": true
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single"
+    },
+    "experiments": {
+      "baseUrl": "/Talkflow"
+    }
+  }
+}
